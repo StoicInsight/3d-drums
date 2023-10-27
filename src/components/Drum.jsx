@@ -1,47 +1,37 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Suspense } from 'react';
 import { useLoader } from '@react-three/fiber';
-import { OrbitControls, TransformControls } from '@react-three/drei';
-
-// export default function Drum() {
-//   return (
-//     <>
-//       <OrbitControls />
-
-//       <directionalLight position={[1, 2, 3]} intensity={1.5} />
-//       <ambientLight intensity={0.5} />
-
-//       <mesh position-x={-2}>
-//         <sphereGeometry />
-//         <meshStandardMaterial color='orange' />
-//       </mesh>
-//       <TransformControls>
-//         <mesh position-x={2} scale={1.5}>
-//           <boxGeometry />
-//           <meshStandardMaterial color='mediumpurple' />
-//         </mesh>
-//       </TransformControls>
-
-//       <mesh position-y={-1} rotation-x={-Math.PI * 0.5} scale={10}>
-//         <planeGeometry />
-//         <meshStandardMaterial color='greenyellow' />
-//       </mesh>
-//     </>
-//   );
-// }
+import { OrbitControls, TransformControls, Resize } from '@react-three/drei';
+import extends
 
 function ModelViewer() {
   const glbUrl = '/drumset.glb';
+  const stickUrl = '/drumstick.glb';
+  const { viewport } = extends useThree();
+
+  const stickRef = useRef();
+
+  useFrame(({ mouse }) => {
+    const x = (mouse.x * viewport.width) / 2;
+    const y = (mouse.y * viewport.height) / 2;
+    stickRef.current.position.set(x, y, 0);
+    stickRef.current.rotation.set(-y, x, 0);
+  });
 
   return (
-    <Canvas onClick={(e) => console.log(e)}>
+    <Canvas>
       <OrbitControls />
       <ambientLight intensity={0.5} />
       <pointLight position={[10, 10, 10]} />
       <Suspense fallback={null}>
-        <Model glbUrl={glbUrl} />
+        <Resize>
+          <Model glbUrl={glbUrl} scale={4} />
+        </Resize>
+        <Resize>
+          <Model glbUrl={stickUrl} scale={1} />
+        </Resize>
       </Suspense>
     </Canvas>
   );
